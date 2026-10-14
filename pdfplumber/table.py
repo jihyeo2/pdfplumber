@@ -504,19 +504,19 @@ class TableSettings:
     text_settings: Optional[Dict[str, Any]] = None
 
     def __post_init__(self) -> None:
-        """Clean up user-provided table settings.
+        """Validate settings and fill in derived defaults, in place.
 
-        Validates that the table settings provided consists of acceptable values and
-        returns a cleaned up version. The cleaned up version fills out the missing
-        values with the default values in the provided settings.
+        Raises ValueError if a numeric setting is negative or a strategy is not
+        one of TABLE_STRATEGIES. Fills unset snap/join/intersection x/y
+        tolerances from their combined counterparts, and maps the legacy
+        ``text_tolerance`` to ``x_tolerance``/``y_tolerance`` in text_settings.
+
+        Unrecognised keys never reach this method; the dataclass __init__
+        rejects them with TypeError.
 
         TODO: Can be further used to validate that the values are of the correct
             type. For example, raising a value error when a non-boolean input is
             provided for the key ``keep_blank_chars``.
-
-        :param table_settings: User-provided table settings.
-        :returns: A cleaned up version of the user-provided table settings.
-        :raises ValueError: When an unrecognised key is provided.
         """
 
         for setting in NON_NEGATIVE_SETTINGS:
